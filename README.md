@@ -1,1 +1,1 @@
-"# project-02-crypto-data" 
+# project-02-crypto-data
