@@ -2,10 +2,14 @@
 
 (() => {
 
+    // SETUP TIMESTAMP HERE! THEN DATE.NOW - TIMESTEMP >= 120000 THEN GETDATA()
+    let timestamp = Date.now();
     const searchButton = document.getElementById("search-button");
-    const searchTextbox = document.getElementById("search-textbox");
-    searchButton.addEventListener("click", () => searchData(searchTextbox.value));
-    searchTextbox.addEventListener("input", () => searchData(searchTextbox.value));
+    const searchTextField = document.getElementById("search-textbox");
+    const mainArea = document.getElementById("main-area");
+
+    searchButton.addEventListener("click", () => search(searchTextField.value));
+    searchTextField.addEventListener("input", () => search(searchTextField.value));
 
     // create empty object in local storage in case of a read from it before data is loaded in.
     if (JSON.parse(localStorage.getItem("coins-list")) === null) {
@@ -14,10 +18,9 @@
     };
 
     // get data from api
-    async function getData() {
+    function getData() {
         const options = { method: 'GET', headers: { accept: 'application/json' } }; // copy-paste code example from coingecko
-
-        await fetch('https://api.coingecko.com/api/v3/coins/markets?order=market_cap_desc&vs_currency=usd#', options)
+        fetch('https://api.coingecko.com/api/v3/coins/markets?order=market_cap_desc&vs_currency=usd#', options)
             .then(response => response.json())
             .then(response => saveData(response))
             .catch(err => console.error(err));
@@ -34,11 +37,11 @@
     }
 
     // find coins that contain search string in coin name
-    function searchData(searchString) {
+    function searchData(queryString) {
         const data = loadData();
         let results = [];
         data.forEach(element => {
-            if (element["name"].toLowerCase().includes(searchString.toLowerCase())) {
+            if (element["name"].toLowerCase().includes(queryString.toLowerCase())) {
                 let foundCoin = {};
                 for (const key in element) {
                     foundCoin[key] = element[key];
@@ -46,9 +49,15 @@
                 results.push(foundCoin);
             }
         });
+        return results;
+    }
+
+    // display search results
+    function search(queryString) {
+        const results = searchData(queryString);
         console.log(results);
-        //return results;
+        mainArea.textContent = '';
+        mainArea.appendChild(document.createElement("div"))
     }
 
 })();
-
