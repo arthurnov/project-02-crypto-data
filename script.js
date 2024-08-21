@@ -54,10 +54,15 @@
 
     // display search results
     function search(queryString) {
+        if (Date.now() - timestamp > 120000) {
+            getData();
+        }
         const results = searchData(queryString);
         console.log(results);
         mainArea.textContent = '';
+        
         mainArea.appendChild(document.createElement("div"))
+        mainArea.getElementsByTagName("div")[0].appendChild(document.createElement("p"));
     }
 
 })();
