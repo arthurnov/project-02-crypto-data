@@ -2,3 +2,16 @@ html,
 body {
     font-family: monospace;
 }
+
+#main-area {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.coin-div {
+    border: 1px solid black;
+    border-radius: 5px;
+    width: 250px;
+    min-width: 250px;
+    max-width: 250px;
+}

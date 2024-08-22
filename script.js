@@ -66,10 +66,15 @@
 
         data.forEach(element => {
             let coinDiv = document.createElement("div");
-            coinDiv.innerHTML = `---------- COIN: ${element["name"]} ----------<br>`
-            for (const key in element) {
-                coinDiv.innerHTML += `${key}: ${element[key]}<br>`
-            }
+            coinDiv.id = `${element["symbol"]}-div`;
+            coinDiv.className = `coin-div`;
+            // coinDiv.innerHTML = `---------- COIN: ${element["name"]} ----------<br>`;
+            // for (const key in element) {
+            //     coinDiv.innerHTML += `${key}: ${element[key]}<br>`;
+            // }
+            coinDiv.innerHTML += `<span class="coin-symbol">${element["symbol"]}</span>
+            <span class="coin-name">${element["name"]}</span>
+            <span class="coin-info"><button>More Info</button></span>`;
             mainArea.appendChild(coinDiv);
         });
     }
