@@ -41,7 +41,7 @@
         const data = loadData();
         let results = [];
         data.forEach(element => {
-            if (element["name"].toLowerCase().includes(queryString.toLowerCase())) {
+            if (element["name"].toLowerCase().includes(queryString.toLowerCase()) || element["symbol"].toLowerCase().includes(queryString.toLowerCase())) {
                 let foundCoin = {};
                 for (const key in element) {
                     foundCoin[key] = element[key];
@@ -54,15 +54,24 @@
 
     // display search results
     function search(queryString) {
-        if (Date.now() - timestamp > 120000) {
-            getData();
-        }
+        // if (Date.now() - timestamp > 120000) {
+        //     getData();
+        // }
         const results = searchData(queryString);
-        console.log(results);
+        drawCards(results);
+    }
+
+    function drawCards(data) {
         mainArea.textContent = '';
-        
-        mainArea.appendChild(document.createElement("div"))
-        mainArea.getElementsByTagName("div")[0].appendChild(document.createElement("p"));
+
+        data.forEach(element => {
+            let coinDiv = document.createElement("div");
+            coinDiv.innerHTML = `---------- COIN: ${element["name"]} ----------<br>`
+            for (const key in element) {
+                coinDiv.innerHTML += `${key}: ${element[key]}<br>`
+            }
+            mainArea.appendChild(coinDiv);
+        });
     }
 
 })();
