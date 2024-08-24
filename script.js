@@ -2,14 +2,17 @@
 
 (() => {
 
-    // SETUP TIMESTAMP HERE! THEN DATE.NOW - TIMESTEMP >= 120000 THEN GETDATA()
+    // timestamp to limit api calls
     let timestamp = Date.now();
+
     const searchButton = document.getElementById("search-button");
     const searchTextField = document.getElementById("search-textbox");
     const mainArea = document.getElementById("main-area");
 
     searchButton.addEventListener("click", () => search(searchTextField.value));
     searchTextField.addEventListener("input", () => search(searchTextField.value));
+
+    //drawCards(loadData());
 
     // create empty object in local storage in case of a read from it before data is loaded in.
     if (JSON.parse(localStorage.getItem("coins-list")) === null) {
@@ -58,25 +61,37 @@
         //     getData();
         // }
         const results = searchData(queryString);
-        drawCards(results);
+        drawCards(results, queryString);
     }
 
-    function drawCards(data) {
+    function drawCards(data, queryString) {
+        // clear screen
         mainArea.textContent = '';
 
+        // results counter div
+        let countDiv = document.createElement("div");
+        countDiv.id = "results-div";
+        mainArea.appendChild(countDiv);
+        let count = 0;
+
+        // coin cards div
+        let cardsDiv = document.createElement("div");
+        cardsDiv.id = "cards-div";
+        mainArea.appendChild(cardsDiv);
+
+        // coin cards
         data.forEach(element => {
+            count++;
             let coinDiv = document.createElement("div");
             coinDiv.id = `${element["symbol"]}-div`;
             coinDiv.className = `coin-div`;
-            // coinDiv.innerHTML = `---------- COIN: ${element["name"]} ----------<br>`;
-            // for (const key in element) {
-            //     coinDiv.innerHTML += `${key}: ${element[key]}<br>`;
-            // }
             coinDiv.innerHTML += `<span class="coin-symbol">${element["symbol"]}</span>
             <span class="coin-name">${element["name"]}</span>
             <span class="coin-info"><button>More Info</button></span>`;
-            mainArea.appendChild(coinDiv);
+            cardsDiv.appendChild(coinDiv);
         });
+
+        countDiv.innerText = `Showing ${count} results for "${queryString}"`;
     }
 
 })();

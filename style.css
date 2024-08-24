@@ -5,13 +5,28 @@ body {
 
 #main-area {
     display: flex;
+    flex-direction: column;
     flex-wrap: wrap;
+    padding-top: 20px;
+    padding-bottom: 20px;
+    gap: 10px;
+}
+
+#footer-area {}
+
+#cards-div {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
 }
 
 .coin-div {
     border: 1px solid black;
     border-radius: 5px;
     width: 250px;
-    min-width: 250px;
-    max-width: 250px;
+    min-width: 200px;
+    max-width: 200px;
+    height: 100px;
+    min-height: 100px;
+    max-height: 100px;
 }
