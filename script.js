@@ -9,10 +9,17 @@
     const searchTextField = document.getElementById("search-textbox");
     const mainArea = document.getElementById("main-area");
 
+    const homeLink = document.getElementById("home-link");
+    homeLink.addEventListener("click", () => drawCards(loadData()));
+    const liveLink = document.getElementById("live-link");
+    liveLink.addEventListener("click", () => drawGraph());
+    const aboutLink = document.getElementById("about-link");
+    aboutLink.addEventListener("click", () => drawAbout());
+
     searchButton.addEventListener("click", () => search(searchTextField.value));
     searchTextField.addEventListener("input", () => search(searchTextField.value));
 
-    //drawCards(loadData());
+    drawCards(loadData());
 
     // create empty object in local storage in case of a read from it before data is loaded in.
     if (JSON.parse(localStorage.getItem("coins-list")) === null) {
@@ -85,13 +92,28 @@
             let coinDiv = document.createElement("div");
             coinDiv.id = `${element["symbol"]}-div`;
             coinDiv.className = `coin-div`;
-            coinDiv.innerHTML += `<span class="coin-symbol">${element["symbol"]}</span>
-            <span class="coin-name">${element["name"]}</span>
-            <span class="coin-info"><button>More Info</button></span>`;
+            coinDiv.innerHTML += `
+            <div class="coin-symbol">${element["symbol"]}</div>
+            <div class="coin-name">${element["name"]}</div>
+            <div class="coin-info"><button>More Info</button></div>`;
             cardsDiv.appendChild(coinDiv);
         });
 
-        countDiv.innerText = `Showing ${count} results for "${queryString}"`;
+        if (queryString === "" || queryString === undefined) {
+            countDiv.innerText = `Showing ${count} coins`;
+        } else {
+            countDiv.innerText = `Showing ${count} results for "${queryString}"`;
+        }
+    }
+
+    function drawGraph() {
+        // clear screen
+        mainArea.textContent = '';
+    }
+
+    function drawAbout() {
+        // clear screen
+        mainArea.textContent = '';
     }
 
 })();

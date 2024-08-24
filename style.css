@@ -14,6 +14,8 @@ body {
 
 #footer-area {}
 
+.nav-button {}
+
 #cards-div {
     display: flex;
     flex-wrap: wrap;
