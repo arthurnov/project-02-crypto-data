@@ -28,9 +28,18 @@
     };
 
     // get data from api
+    // function getData() {
+    //     const options = { method: 'GET', headers: { accept: 'application/json' } }; // copy-paste code example from coingecko
+    //     fetch('https://api.coingecko.com/api/v3/coins/markets?order=market_cap_desc&vs_currency=usd#', options)
+    //         .then(response => response.json())
+    //         .then(response => saveData(response))
+    //         .catch(err => console.error(err));
+    // }
+
+    // get data from api
     function getData() {
         const options = { method: 'GET', headers: { accept: 'application/json' } }; // copy-paste code example from coingecko
-        fetch('https://api.coingecko.com/api/v3/coins/markets?order=market_cap_desc&vs_currency=usd#', options)
+        fetch('https://api.coingecko.com/api/v3/coins/list', options)
             .then(response => response.json())
             .then(response => saveData(response))
             .catch(err => console.error(err));
@@ -66,27 +75,29 @@
     function search(queryString) {
         // if (Date.now() - timestamp > 120000) {
         //     getData();
+        //     timestamp = Date.now();
         // }
         const results = searchData(queryString);
         drawCards(results, queryString);
     }
 
+    // "home" page
     function drawCards(data, queryString) {
         // clear screen
         mainArea.textContent = '';
 
-        // results counter div
+        // setup results counter div
         let countDiv = document.createElement("div");
         countDiv.id = "results-div";
         mainArea.appendChild(countDiv);
         let count = 0;
 
-        // coin cards div
+        // setup coin cards div
         let cardsDiv = document.createElement("div");
         cardsDiv.id = "cards-div";
         mainArea.appendChild(cardsDiv);
 
-        // coin cards
+        // build and "draw" coin cards
         data.forEach(element => {
             count++;
             let coinDiv = document.createElement("div");
@@ -95,10 +106,12 @@
             coinDiv.innerHTML += `
             <div class="coin-symbol">${element["symbol"]}</div>
             <div class="coin-name">${element["name"]}</div>
-            <div class="coin-info"><button>More Info</button></div>`;
+            <div class="coin-info"><button>More Info</button></div>
+            <input type="checkbox" class="coin-check" id="${element["symbol"]}-check">`;
             cardsDiv.appendChild(coinDiv);
         });
 
+        // draw results counter.
         if (queryString === "" || queryString === undefined) {
             countDiv.innerText = `Showing ${count} coins`;
         } else {
@@ -106,11 +119,13 @@
         }
     }
 
+    // "live reports" page
     function drawGraph() {
         // clear screen
         mainArea.textContent = '';
     }
 
+    // "about" page
     function drawAbout() {
         // clear screen
         mainArea.textContent = '';
