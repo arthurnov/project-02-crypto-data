@@ -63,15 +63,21 @@
         localStorage.setItem("coins-list", JSON.stringify(data));
     }
 
+    // save coin specific data local storage
     function saveCoinData(data) {
-        let coins = (localStorage.getItem("coin-data-list") === null) ? {} : localStorage.getItem("coin-data-list");
-
-        localStorage.setItem("coin-data-list", JSON.stringify(coins));
+        let coins = (localStorage.getItem("coin-data-list") === null) ? new Map([]) : new Map(JSON.parse(localStorage.getItem("coin-data-list")));
+        coins.set(data["id"], data);
+        localStorage.setItem("coin-data-list", JSON.stringify([...coins]));
     }
 
     // load data from local storage
     function loadData() {
         return JSON.parse(localStorage.getItem("coins-list"));
+    }
+
+    // load coin specific data from local storage
+    function loadCoinData(id) {
+        return new Map(JSON.parse(localStorage.getItem("coin-data-list"))).get(id);
     }
 
     // get data from api
@@ -84,15 +90,15 @@
     }
 
     // get coin specific data from api
-    // function getCoinData(id) {
-    //     const options = { method: 'GET', headers: { accept: 'application/json' } }; // copy-paste code example from coingecko
-    //     fetch(`https://api.coingecko.com/api/v3/coins/${id}?tickers=false&community_data=false&developer_data=false&sparkline=false`, options)
-    //         .then(response => response.json())
-    //         .then(response => console.log(response))
-    //         .catch(err => console.error(err));
-    // }
+    function getCoinData(id) {
+        const options = { method: 'GET', headers: { accept: 'application/json' } }; // copy-paste code example from coingecko
+        fetch(`https://api.coingecko.com/api/v3/coins/${id}?localization=false?tickers=false&community_data=false&developer_data=false&sparkline=false`, options)
+            .then(response => response.json())
+            .then(response => saveCoinData(response))
+            .catch(err => console.error(err));
+    }
 
-    console.log(localStorage.getItem("coin-data-list"));
+    //console.log(localStorage.getItem("coin-data-list"));
 
     //getCoinData("bitcoin");
 
