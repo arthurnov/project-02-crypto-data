@@ -2,6 +2,8 @@
 
 (() => {
 
+    // -------------------- INITIAL SETUP --------------------
+
     // timestamp to limit api calls
     let timestamp = Date.now();
 
@@ -19,41 +21,14 @@
     searchButton.addEventListener("click", () => search(searchTextField.value));
     searchTextField.addEventListener("input", () => search(searchTextField.value));
 
-    drawCards(loadData());
-
     // create empty object in local storage in case of a read from it before data is loaded in.
     if (JSON.parse(localStorage.getItem("coins-list")) === null) {
         //localStorage.setItem("coins-list", JSON.stringify([]));
         getData();
     };
+    drawCards(loadData());
 
-    // get data from api
-    // function getData() {
-    //     const options = { method: 'GET', headers: { accept: 'application/json' } }; // copy-paste code example from coingecko
-    //     fetch('https://api.coingecko.com/api/v3/coins/markets?order=market_cap_desc&vs_currency=usd#', options)
-    //         .then(response => response.json())
-    //         .then(response => saveData(response))
-    //         .catch(err => console.error(err));
-    // }
-
-    // get data from api
-    function getData() {
-        const options = { method: 'GET', headers: { accept: 'application/json' } }; // copy-paste code example from coingecko
-        fetch('https://api.coingecko.com/api/v3/coins/list', options)
-            .then(response => response.json())
-            .then(response => saveData(response))
-            .catch(err => console.error(err));
-    }
-
-    // save data to local storage
-    function saveData(data) {
-        localStorage.setItem("coins-list", JSON.stringify(data));
-    }
-
-    // load data from local storage
-    function loadData() {
-        return JSON.parse(localStorage.getItem("coins-list"));
-    }
+    // -------------------- SEARCH --------------------
 
     // find coins that contain search string in coin name
     function searchData(queryString) {
@@ -80,6 +55,48 @@
         const results = searchData(queryString);
         drawCards(results, queryString);
     }
+
+    // -------------------- DATA MANIPULATION --------------------
+
+    // save data to local storage
+    function saveData(data) {
+        localStorage.setItem("coins-list", JSON.stringify(data));
+    }
+
+    function saveCoinData(data) {
+        let coins = (localStorage.getItem("coin-data-list") === null) ? {} : localStorage.getItem("coin-data-list");
+
+        localStorage.setItem("coin-data-list", JSON.stringify(coins));
+    }
+
+    // load data from local storage
+    function loadData() {
+        return JSON.parse(localStorage.getItem("coins-list"));
+    }
+
+    // get data from api
+    function getData() {
+        const options = { method: 'GET', headers: { accept: 'application/json' } }; // copy-paste code example from coingecko
+        fetch('https://api.coingecko.com/api/v3/coins/markets?order=market_cap_desc&vs_currency=usd#', options)
+            .then(response => response.json())
+            .then(response => saveData(response))
+            .catch(err => console.error(err));
+    }
+
+    // get coin specific data from api
+    // function getCoinData(id) {
+    //     const options = { method: 'GET', headers: { accept: 'application/json' } }; // copy-paste code example from coingecko
+    //     fetch(`https://api.coingecko.com/api/v3/coins/${id}?tickers=false&community_data=false&developer_data=false&sparkline=false`, options)
+    //         .then(response => response.json())
+    //         .then(response => console.log(response))
+    //         .catch(err => console.error(err));
+    // }
+
+    console.log(localStorage.getItem("coin-data-list"));
+
+    //getCoinData("bitcoin");
+
+    // -------------------- HOMEPAGE MANIPULATION --------------------
 
     // "home" page
     function drawCards(data, queryString) {
