@@ -18,6 +18,7 @@
     const aboutLink = document.getElementById("about-link");
     aboutLink.addEventListener("click", () => drawAbout());
     let moreInfo = [];
+    let checkboxes = [];
 
 
     searchButton.addEventListener("click", () => search(searchTextField.value));
@@ -114,6 +115,31 @@
         }
     }
 
+    // attach evenListeners to all the checkboxes
+    function getCheckboxes() {
+        checkboxes = document.getElementsByClassName("coin-check");
+        for (let item of checkboxes) {
+            item.addEventListener("change", () => setChecked(item.id, item.checked));
+        }
+    }
+
+    //
+    function setChecked(checkId, isChecked) {
+        let checkboxesList = new Set((localStorage.getItem("checkboxes-list") === null) ? [] : JSON.parse(localStorage.getItem("checkboxes-list")));
+        console.log("pre-if: ", checkboxesList);
+        if (checkboxesList.has(checkId)) {
+            if (isChecked === false) checkboxesList.delete(checkId);
+            else if (isChecked === true && checkboxesList.size < 5) checkboxesList.add(checkId);
+            else if (isChecked === true && checkboxesList.size >= 5) console.log("too many checks");
+        } else {
+            if (isChecked === true && checkboxesList.size < 5) checkboxesList.add(checkId);
+            else if (isChecked === true && checkboxesList.size >= 5) console.log("too many checks");
+        }
+        console.log("post-if: ", checkboxesList);
+        localStorage.setItem("checkboxes-list", JSON.stringify(checkboxesList));
+        console.log(`id: ${checkId}, event: ${isChecked}`);
+    }
+
     // "more info" button functionality
     async function showMoreInfo(id) {
 
@@ -190,6 +216,7 @@
         }
 
         getInfoButtons();
+        getCheckboxes()
 
     }
 
