@@ -96,11 +96,12 @@
 
     // get coin specific data from api
     async function getCoinData(id) {
+        showLoading(id, true);
         const options = { method: 'GET', headers: { accept: 'application/json' } }; // copy-paste code example from coingecko
         await fetch(`https://api.coingecko.com/api/v3/coins/${id}?localization=false?tickers=false&community_data=false&developer_data=false&sparkline=false`, options)
             .then(response => response.json())
-            .then(response => saveCoinData(response))
-            .catch(err => console.error(err));
+            .then(response => { saveCoinData(response); showLoading(id, false); })
+            .catch(err => { console.error(err); showLoading(id, false) });
     }
 
     // -------------------- HOMEPAGE HELPERS --------------------
@@ -113,9 +114,11 @@
         }
     }
 
+    // "more info" button functionality
     async function showMoreInfo(id) {
-        let moreInfoList = new Map((localStorage.getItem("more-info-list") === null) ? [] : JSON.parse(localStorage.getItem("more-info-list")));
+
         // if id not in list or its been more than 2 minutes since last api call for id - call api.
+        let moreInfoList = new Map((localStorage.getItem("more-info-list") === null) ? [] : JSON.parse(localStorage.getItem("more-info-list")));
         if (!moreInfoList.has(id) || Date.now() - moreInfoList.get(id) > 120000) {
             moreInfoList.set(id, Date.now());
             await getCoinData(id);
@@ -130,6 +133,20 @@
         console.log("USD: ", coin["market_data"]["current_price"]["usd"]);
         console.log("EUR: ", coin["market_data"]["current_price"]["eur"]);
         console.log("ILS: ", coin["market_data"]["current_price"]["ils"]);
+    }
+
+    // replace "more info" button with "loading" text
+    function showLoading(id, status) {
+        let moreInfoParent = document.getElementById(`${id}-parent`);
+        if (status) {
+            moreInfoParent.childNodes[0].style.display = "none";
+            let child = document.createElement("span");
+            child.innerText = "Loading...";
+            moreInfoParent.appendChild(child);
+        } else {
+            moreInfoParent.childNodes[0].style.display = "inline-block";
+            moreInfoParent.removeChild(moreInfoParent.childNodes[1]);
+        }
     }
 
     // -------------------- HOMEPAGE MANIPULATION --------------------
@@ -160,7 +177,7 @@
             coinDiv.innerHTML += `
             <div class="coin-symbol">${element["symbol"]}</div>
             <div class="coin-name">${element["name"]}</div>
-            <div class="coin-info"><button class="coin-info-button" id="${element["id"]}">More Info</button></div>
+            <div class="coin-info" id="${element["id"]}-parent"><button class="coin-info-button" id="${element["id"]}">More Info</button></div>
             <input type="checkbox" class="coin-check" id="${element["id"]}-check">`;
             cardsDiv.appendChild(coinDiv);
         });
