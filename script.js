@@ -17,11 +17,12 @@
     liveLink.addEventListener("click", () => drawGraph());
     const aboutLink = document.getElementById("about-link");
     aboutLink.addEventListener("click", () => drawAbout());
+    let moreInfo = [];
 
     searchButton.addEventListener("click", () => search(searchTextField.value));
     searchTextField.addEventListener("input", () => search(searchTextField.value));
 
-    // create empty object in local storage in case of a read from it before data is loaded in.
+    // if first page load - get coins from api
     if (JSON.parse(localStorage.getItem("coins-list")) === null) {
         //localStorage.setItem("coins-list", JSON.stringify([]));
         getData();
@@ -98,9 +99,15 @@
             .catch(err => console.error(err));
     }
 
-    //console.log(localStorage.getItem("coin-data-list"));
+    // -------------------- HOMEPAGE HELPERS --------------------
 
-    //getCoinData("bitcoin");
+    // attach evenListeners to all the "more info" buttons
+    function getInfoButtons() {
+        moreInfo = document.getElementsByClassName("coin-info-button");
+        for (let item of moreInfo) {
+            item.addEventListener("click", () => getCoinData(item.id))
+        }
+    }
 
     // -------------------- HOMEPAGE MANIPULATION --------------------
 
@@ -129,7 +136,7 @@
             coinDiv.innerHTML += `
             <div class="coin-symbol">${element["symbol"]}</div>
             <div class="coin-name">${element["name"]}</div>
-            <div class="coin-info"><button>More Info</button></div>
+            <div class="coin-info"><button class="coin-info-button" id="${element["id"]}">More Info</button></div>
             <input type="checkbox" class="coin-check" id="${element["symbol"]}-check">`;
             cardsDiv.appendChild(coinDiv);
         });
@@ -140,6 +147,9 @@
         } else {
             countDiv.innerText = `Showing ${count} results for "${queryString}"`;
         }
+        
+        getInfoButtons();
+
     }
 
     // "live reports" page
