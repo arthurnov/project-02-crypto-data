@@ -36,7 +36,6 @@
         };
     })();
 
-
     // -------------------- SEARCH --------------------
 
     // find coins that contain search string in coin name
@@ -147,12 +146,13 @@
         confirmBox.appendChild(document.createElement("span")).innerHTML = `Maximum number of selections reached.<br>Please remove 1 selection in order to continue.`;
         confirmBox.appendChild(document.createElement("div"));
         for (let element of checkSelectedList) {
-            confirmBox.childNodes[1].innerHTML += `<input type="checkbox" class="coin-limit" id="${element}-limit">${element}<br>`
+            confirmBox.childNodes[1].innerHTML += `<input type="checkbox" class="coin-limit" id="${element}-limit" checked>${element}<br>`
         }
         confirmBox.childNodes[1].innerHTML += `
         <button class="coin-check-limit-button" id="limit-ok">ok</button>
         <button class="coin-check-limit-button" id="limit-cancel">cancel</button>`;
         document.getElementById("main-area").replaceChildren(confirmBox);
+
         console.log(checkSelectedList);
     }
 
@@ -179,15 +179,17 @@
 
     // replace "more info" button with "loading" text
     function showLoading(id, status) {
-        let moreInfoParent = document.getElementById(`${id} -parent`);
+        let moreInfoParent = document.getElementById(`${id}-parent`);
+        console.log(moreInfoParent.childNodes);
+
         if (status) {
-            moreInfoParent.childNodes[0].style.display = "none";
+            moreInfoParent.childNodes[1].style.display = "none";
             let child = document.createElement("span");
             child.innerText = "Loading...";
             moreInfoParent.appendChild(child);
         } else {
-            moreInfoParent.childNodes[0].style.display = "inline-block";
-            moreInfoParent.removeChild(moreInfoParent.childNodes[1]);
+            moreInfoParent.childNodes[1].style.display = "inline-block";
+            moreInfoParent.removeChild(moreInfoParent.childNodes[2]);
         }
     }
 
