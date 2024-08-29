@@ -29,7 +29,6 @@
     (async () => {
         // if first page load - get coins from api
         if (JSON.parse(localStorage.getItem("coins-list")) === null) {
-            //localStorage.setItem("coins-list", JSON.stringify([]));
             await getData();
             drawCards(loadData());
         } else {
@@ -122,14 +121,19 @@
     function getCheckboxes() {
         checkboxes = document.getElementsByClassName("coin-check");
         for (let item of checkboxes) {
-            //item.addEventListener("change", () => setChecked(item.id, item.checked));
             item.addEventListener("change", () => setChecked(item));
+        }
+    }
+
+    function addEventsOnLimiters() {
+        let limitCheckboxes = document.getElementsByClassName("coin-limit");
+        for (let item of limitCheckboxes) {
+            item.addEventListener("change", () => setCheckedTracker(item.value));
         }
     }
 
     // track checked cards
     function setChecked(checkbox) {
-        console.log("inside");
         if (checkSelectedList.size >= 5 && checkbox.checked) {
             checkbox.checked = false;
             console.log(checkSelectedList);
@@ -151,20 +155,23 @@
         formElement.id = "form";
         for (let element of checkSelectedList) {
             formElement.innerHTML += `
-            <input type="radio" name="remove-checked" class="coin-limit" id="${element}-limit" value="${element}" onclick="setCheckedTracker(this.value)">
+            <input type="radio" name="remove-checked" class="coin-limit" id="${element}-limit" value="${element}">
             <label for="${element}-limit">${element}</label><br>`
         }
         formElement.innerHTML += `
         <button value="ok" class="coin-check-limit-button" id="limit-ok">ok</button>
         <button class="coin-check-limit-button" id="limit-cancel">cancel</button>`;
         document.getElementById("main-area").replaceChildren(confirmBox);
+        addEventsOnLimiters();
         document.getElementById("limit-ok").addEventListener("click", () => {
-            //event.preventDefault();
             checkSelectedList.delete(checkedTracker);
+            checkbox.checked = true;
             setChecked(checkbox);
-            //drawCards();
+            drawCards(loadData());
         });
-        console.log(checkedTracker);
+        document.getElementById("limit-cancel").addEventListener("click", () => {
+            drawCards(loadData());
+        });
     }
 
     function setCheckedTracker(value) {
@@ -195,8 +202,6 @@
     // replace "more info" button with "loading" text
     function showLoading(id, status) {
         let moreInfoParent = document.getElementById(`${id}-parent`);
-        console.log(moreInfoParent.childNodes);
-
         if (status) {
             moreInfoParent.childNodes[1].style.display = "none";
             let child = document.createElement("span");
