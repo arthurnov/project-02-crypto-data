@@ -20,6 +20,7 @@
     let checkSelectedList = new Set();
     let moreInfo = [];
     let checkboxes = [];
+    let checkedTracker = "";
 
 
     searchButton.addEventListener("click", () => search(searchTextField.value));
@@ -128,6 +129,7 @@
 
     // track checked cards
     function setChecked(checkbox) {
+        console.log("inside");
         if (checkSelectedList.size >= 5 && checkbox.checked) {
             checkbox.checked = false;
             console.log(checkSelectedList);
@@ -141,19 +143,32 @@
         }
     }
 
-    function limitSelection(checkbox) {
+    async function limitSelection(checkbox) {
         let confirmBox = document.createElement("div");
         confirmBox.appendChild(document.createElement("span")).innerHTML = `Maximum number of selections reached.<br>Please remove 1 selection in order to continue.`;
         confirmBox.appendChild(document.createElement("div"));
+        let formElement = confirmBox.childNodes[1].appendChild(document.createElement("div"));
+        formElement.id = "form";
         for (let element of checkSelectedList) {
-            confirmBox.childNodes[1].innerHTML += `<input type="checkbox" class="coin-limit" id="${element}-limit" checked>${element}<br>`
+            formElement.innerHTML += `
+            <input type="radio" name="remove-checked" class="coin-limit" id="${element}-limit" value="${element}" onclick="setCheckedTracker(this.value)">
+            <label for="${element}-limit">${element}</label><br>`
         }
-        confirmBox.childNodes[1].innerHTML += `
-        <button class="coin-check-limit-button" id="limit-ok">ok</button>
+        formElement.innerHTML += `
+        <button value="ok" class="coin-check-limit-button" id="limit-ok">ok</button>
         <button class="coin-check-limit-button" id="limit-cancel">cancel</button>`;
         document.getElementById("main-area").replaceChildren(confirmBox);
+        document.getElementById("limit-ok").addEventListener("click", () => {
+            //event.preventDefault();
+            checkSelectedList.delete(checkedTracker);
+            setChecked(checkbox);
+            //drawCards();
+        });
+        console.log(checkedTracker);
+    }
 
-        console.log(checkSelectedList);
+    function setCheckedTracker(value) {
+        checkedTracker = value;
     }
 
     // "more info" button functionality
@@ -222,7 +237,7 @@
             <div class="coin-symbol"> ${element["symbol"]}</div>
             <div class="coin-name">${element["name"]}</div>
             <div class="coin-info" id="${element["id"]}-parent"> <button class="coin-info-button" id="${element["id"]}">More Info</button></div>
-            <input type="checkbox" class="coin-check" id="${element["id"]}-check">`;
+            <input type="checkbox" class="coin-check" id="${element["id"]}-check" ${(checkSelectedList.has(element["id"])) ? "checked" : ""}>`;
             cardsDiv.appendChild(coinDiv);
         });
 
