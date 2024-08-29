@@ -1,6 +1,6 @@
 "use strict";
 
-(async () => {
+(() => {
 
     // -------------------- INITIAL SETUP --------------------
 
@@ -17,6 +17,7 @@
     liveLink.addEventListener("click", () => drawGraph());
     const aboutLink = document.getElementById("about-link");
     aboutLink.addEventListener("click", () => drawAbout());
+    let checkSelectedList = new Set();
     let moreInfo = [];
     let checkboxes = [];
 
@@ -24,14 +25,16 @@
     searchButton.addEventListener("click", () => search(searchTextField.value));
     searchTextField.addEventListener("input", () => search(searchTextField.value));
 
-    // if first page load - get coins from api
-    if (JSON.parse(localStorage.getItem("coins-list")) === null) {
-        //localStorage.setItem("coins-list", JSON.stringify([]));
-        await getData();
-        drawCards(loadData());
-    } else {
-        drawCards(loadData());
-    };
+    (async () => {
+        // if first page load - get coins from api
+        if (JSON.parse(localStorage.getItem("coins-list")) === null) {
+            //localStorage.setItem("coins-list", JSON.stringify([]));
+            await getData();
+            drawCards(loadData());
+        } else {
+            drawCards(loadData());
+        };
+    })();
 
 
     // -------------------- SEARCH --------------------
@@ -119,25 +122,38 @@
     function getCheckboxes() {
         checkboxes = document.getElementsByClassName("coin-check");
         for (let item of checkboxes) {
-            item.addEventListener("change", () => setChecked(item.id, item.checked));
+            //item.addEventListener("change", () => setChecked(item.id, item.checked));
+            item.addEventListener("change", () => setChecked(item));
         }
     }
 
-    //
-    function setChecked(checkId, isChecked) {
-        let checkboxesList = new Set((localStorage.getItem("checkboxes-list") === null) ? [] : JSON.parse(localStorage.getItem("checkboxes-list")));
-        console.log("pre-if: ", checkboxesList);
-        if (checkboxesList.has(checkId)) {
-            if (isChecked === false) checkboxesList.delete(checkId);
-            else if (isChecked === true && checkboxesList.size < 5) checkboxesList.add(checkId);
-            else if (isChecked === true && checkboxesList.size >= 5) console.log("too many checks");
-        } else {
-            if (isChecked === true && checkboxesList.size < 5) checkboxesList.add(checkId);
-            else if (isChecked === true && checkboxesList.size >= 5) console.log("too many checks");
+    // track checked cards
+    function setChecked(checkbox) {
+        if (checkSelectedList.size >= 5 && checkbox.checked) {
+            checkbox.checked = false;
+            console.log(checkSelectedList);
+            limitSelection(checkbox);
+        } else if (checkSelectedList.size < 5 && checkbox.checked) {
+            checkSelectedList.add(checkbox.id.slice(0, -6));
+            console.log(checkSelectedList);
+        } else if (!checkbox.checked) {
+            checkSelectedList.delete(checkbox.id.slice(0, -6));
+            console.log(checkSelectedList);
         }
-        console.log("post-if: ", checkboxesList);
-        localStorage.setItem("checkboxes-list", JSON.stringify(checkboxesList));
-        console.log(`id: ${checkId}, event: ${isChecked}`);
+    }
+
+    function limitSelection(checkbox) {
+        let confirmBox = document.createElement("div");
+        confirmBox.appendChild(document.createElement("span")).innerHTML = `Maximum number of selections reached.<br>Please remove 1 selection in order to continue.`;
+        confirmBox.appendChild(document.createElement("div"));
+        for (let element of checkSelectedList) {
+            confirmBox.childNodes[1].innerHTML += `<input type="checkbox" class="coin-limit" id="${element}-limit">${element}<br>`
+        }
+        confirmBox.childNodes[1].innerHTML += `
+        <button class="coin-check-limit-button" id="limit-ok">ok</button>
+        <button class="coin-check-limit-button" id="limit-cancel">cancel</button>`;
+        document.getElementById("main-area").replaceChildren(confirmBox);
+        console.log(checkSelectedList);
     }
 
     // "more info" button functionality
@@ -163,7 +179,7 @@
 
     // replace "more info" button with "loading" text
     function showLoading(id, status) {
-        let moreInfoParent = document.getElementById(`${id}-parent`);
+        let moreInfoParent = document.getElementById(`${id} -parent`);
         if (status) {
             moreInfoParent.childNodes[0].style.display = "none";
             let child = document.createElement("span");
@@ -201,9 +217,9 @@
             coinDiv.id = `${element["symbol"]}-div`;
             coinDiv.className = `coin-div`;
             coinDiv.innerHTML += `
-            <div class="coin-symbol">${element["symbol"]}</div>
+            <div class="coin-symbol"> ${element["symbol"]}</div>
             <div class="coin-name">${element["name"]}</div>
-            <div class="coin-info" id="${element["id"]}-parent"><button class="coin-info-button" id="${element["id"]}">More Info</button></div>
+            <div class="coin-info" id="${element["id"]}-parent"> <button class="coin-info-button" id="${element["id"]}">More Info</button></div>
             <input type="checkbox" class="coin-check" id="${element["id"]}-check">`;
             cardsDiv.appendChild(coinDiv);
         });
